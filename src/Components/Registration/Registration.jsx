@@ -1,101 +1,77 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-class Registration extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: ''
-    };
-  }
-
-  handleChange = (e) => {
-    this.setState({ [e.target.id]: e.target.value });
-  };
-
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const { firstName, lastName, email, password } = this.state;
-    const userData = {
-      firstName,
-      lastName,
-      email,
-      password
-    };
-
+const Registration = () => {
+  const handleSubmit = (values) => {
     const storedData = localStorage.getItem('userData');
     if (storedData) {
       toast.error('Вы уже зарегистрированы');
     } else {
-      localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem('userData', JSON.stringify(values));
       toast.success('Регистрация успешна!');
       window.location.reload();
     }
   };
 
-  render() {
-    const { firstName, lastName, email, password } = this.state;
-
-    return (
-      <div className="container">
-        <h1>Регистрация</h1>
-        <form onSubmit={this.handleSubmit}>
+  return (
+    <div className="container">
+      <h1>Регистрация</h1>
+      <Formik
+        initialValues={{
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: ''
+        }}
+        validate={(values) => {
+          const errors = {};
+          if (!values.firstName) {
+            errors.firstName = 'Обязательное поле';
+          }
+          if (!values.lastName) {
+            errors.lastName = 'Обязательное поле';
+          }
+          if (!values.email) {
+            errors.email = 'Обязательное поле';
+          }
+          if (!values.password) {
+            errors.password = 'Обязательное поле';
+          }
+          return errors;
+        }}
+        onSubmit={handleSubmit}
+      >
+        <Form>
           <div className="mb-3">
             <label htmlFor="firstName" className="form-label">Имя</label>
-            <input
-              type="text"
-              id="firstName"
-              className="form-control"
-              value={firstName}
-              onChange={this.handleChange}
-              required
-            />
+            <Field type="text" id="firstName" name="firstName" className="form-control" required />
+            <ErrorMessage name="firstName" component="div" className="error" />
           </div>
           <div className="mb-3">
             <label htmlFor="lastName" className="form-label">Фамилия</label>
-            <input
-              type="text"
-              id="lastName"
-              className="form-control"
-              value={lastName}
-              onChange={this.handleChange}
-              required
-            />
+            <Field type="text" id="lastName" name="lastName" className="form-control" required />
+            <ErrorMessage name="lastName" component="div" className="error" />
           </div>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email</label>
-            <input
-              type="email"
-              id="email"
-              className="form-control"
-              value={email}
-              onChange={this.handleChange}
-              required
-            />
+            <Field type="email" id="email" name="email" className="form-control" required />
+            <ErrorMessage name="email" component="div" className="error" />
           </div>
           <div className="mb-3">
             <label htmlFor="password" className="form-label">Пароль</label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              value={password}
-              onChange={this.handleChange}
-              required
-            />
+            <Field type="password" id="password" name="password" className="form-control" required />
+            <ErrorMessage name="password" component="div" className="error" />
           </div>
           <button type="submit" className="btn btn-primary">Зарегистрироваться</button>
           <Link to="/profile"><button className='btn btn-info'>Профиль</button></Link>
-        </form>
-        <ToastContainer />
-      </div>
-    );
-  }
-}
+        </Form>
+      </Formik>
+      <ToastContainer />
+    </div>
+  );
+};
 
 export default Registration;

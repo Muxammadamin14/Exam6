@@ -10,28 +10,36 @@ const AddProduct = () => {
   const [discountedPrice, setDiscountedPrice] = useState('');
   const [brand, setBrand] = useState('');
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState(null);
+
+  const handleImageUpload = (e) => {
+    const selectedImage = e.target.files[0];
+    setImage(selectedImage);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newProduct = {
-      name: name,
-      price: price,
-      priceSale: discountedPrice,
-      brand: brand,
-      description: description,
-    };
+    const formData = new FormData();
+    formData.append('image', image);
 
     try {
+      const imageResponse = await axios.post('https://64dcf61be64a8525a0f76c4d.mockapi.io/api/v1/products', formData);
+      const imageUrl = imageResponse.data.imageUrl;
+
+      const newProduct = {
+        name: name,
+        price: price,
+        discountedPrice: discountedPrice,
+        brand: brand,
+        description: description,
+        image: imageUrl,
+      };
+
       const response = await axios.post('https://64dcf61be64a8525a0f76c4d.mockapi.io/api/v1/products', newProduct);
 
       if (response.status === 201) {
         toast.success('Товар успешно добавлен');
-        setName('');
-        setPrice('');
-        setDiscountedPrice('');
-        setBrand('');
-        setDescription('');
       } else {
         toast.error('Ошибка при добавлении товара');
       }
@@ -65,10 +73,15 @@ const AddProduct = () => {
           <label htmlFor="description" className="form-label">Описание</label>
           <textarea className="form-control" id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
         </div>
+        <div className="mb-3">
+          <label htmlFor="image" className="form-label">Картинка</label>
+          <input type="file" className="form-control" id="image" onChange={handleImageUpload} />
+          {image && <img src={URL.createObjectURL(image)} alt="Выбранная картинка" />}
+        </div>
         <button type="submit" className="btn btn-primary">Добавить</button>
         <Link to="/home"><button className='createNewProduct'>Назад</button></Link>
       </form>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };
