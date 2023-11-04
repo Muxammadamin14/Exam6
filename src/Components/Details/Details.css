@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+.load{
+margin-left: 700px;
+margin-top: 100px;
+}
+
 .details {
   width: 300px;
   height: 450px;
@@ -17,4 +22,5 @@
   text-align: center;
   align-items: center;
   margin-left: 500px;
+  padding-top: 100px;
 }

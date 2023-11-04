@@ -8,19 +8,20 @@ import axios from 'axios';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('https://64dcf61be64a8525a0f76c4d.mockapi.io/api/v1/products');
+        const response = await axios.get('https://6545dcc1fe036a2fa954e375.mockapi.io/api/v1/products/name');
         setProducts(response.data);
         setLoading(false);
       } catch (error) {
         console.log(error);
+        setLoading(false);
       }
     };
 
@@ -29,16 +30,14 @@ const Home = () => {
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products
-    .filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
   const paginate = ({ selected }) => setCurrentPage(selected + 1);
 
   const handleDelete = (id) => {
     if (window.confirm('Вы уверены, что хотите удалить товар?')) {
       axios
-        .delete(`https://64dcf61be64a8525a0f76c4d.mockapi.io/api/v1/products/${id}`)
+        .delete(`https://6545dcc1fe036a2fa954e375.mockapi.io/api/v1/products/name/${id}`)
         .then(() => {
           setProducts(products.filter((product) => product.id !== id));
           toast.success('Товар успешно удален');
@@ -51,9 +50,11 @@ const Home = () => {
   };
 
   const renderPageNumbers = () => {
+    const pageNumbers = Math.ceil(products.length / productsPerPage);
+
     return (
       <ul className="pagination">
-        {Array.from({ length: Math.ceil(products.length / productsPerPage) }).map((_, index) => (
+        {Array.from({ length: pageNumbers }).map((_, index) => (
           <li key={index} className={currentPage === index + 1 ? 'active' : ''}>
             <button className='btn btn-info gap' onClick={() => setCurrentPage(index + 1)}>{index + 1}</button>
           </li>
@@ -78,9 +79,9 @@ const Home = () => {
       <div className="Sections2">
         <div className="MinSections1">
           <div className="globalmenu">
-            <h1>Товары</h1>
+            <h1>Пациенты</h1>
             <Link to="/profile"><button className='btn btn-info btnLogout'>Профиль</button></Link>
-            <Link to="/add"><button className='createNewProduct'>Создать Новый Товар</button></Link>
+            <Link to="/add"><button className='createNewProduct'>Создать Новый Пациент</button></Link>
             <input
               type="text"
               placeholder="Поиск..."
@@ -89,19 +90,19 @@ const Home = () => {
             />
           </div>
           <div className="globalmenu1">
-            <p>Главная / Товары</p>
+            <p>Главная / Пациенты</p>
           </div>
         </div>
         <div className="MinSections2">
           {loading ? (
-           <div className="spinner-border" role="status">
-           <span className="visually-hidden">Loading...</span>
-         </div>
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
           ) : currentProducts.length === 0 ? (
             <div>
-              <div className="notProduct1"><h1>Вы пока не создали ни одного товара</h1></div>
+              <div className="notProduct1"><h1>Вы пока не создали ни одного Пациента</h1></div>
               <div className="notProduct2"><img src={notFount} alt="notFound" /></div>
-              <div className="notProduct3"><Link to="/add"><button className='createNewProduct'>Создать Новый Товар</button></Link></div>
+              <div className="notProduct3"><Link to="/add"><button className='createNewProduct'>Создать Новый Пациент</button></Link></div>
             </div>
           ) : (
             <div>
@@ -110,7 +111,7 @@ const Home = () => {
                   <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Brand</th>
+                    <th>Price</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -121,7 +122,7 @@ const Home = () => {
                       <td>
                         <Link to={`/details/${product.id}`}>{product.name}</Link>
                       </td>
-                      <td>{product.brand}</td>
+                      <td>{product.discountedPrice}</td>
                       <td>
                         <Link to={`/edit/${product.id}`} className="btn btn-primary">Edit</Link>
                         <button className="btn btn-danger" onClick={() => handleDelete(product.id)}>Delete</button>

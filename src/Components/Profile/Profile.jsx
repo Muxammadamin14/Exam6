@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import './Profile.css';
 
 const Profile = (props) => {
   const [userData, setUserData] = useState(null);
@@ -14,24 +15,29 @@ const Profile = (props) => {
   const handleLogout = () => {
     window.location.reload(); // Обновляем страницу
     localStorage.removeItem('userData'); // Удаляем данные пользователя из localStorage
-    props.history.push('/'); 
+    props.history.push('/');
   };
 
   return (
     <div className="container">
       <h1>Профиль</h1>
       {userData ? (
-        <div>
+        <div className="profile-details">
           <p>Имя: {userData.firstName}</p>
           <p>Фамилия: {userData.lastName}</p>
           <p>Email: {userData.email}</p>
           <p>Пароль: {userData.password}</p>
-          <button className="btn btn-primary" onClick={handleLogout}>Выйти</button>
-          <Link to="/add"><button className='createNewProduct'>Создать Новый Товар</button></Link>
-          <Link to="/home"><button className='createNewProduct'>Товар</button></Link>
+          <div className="profile-buttons">
+            <Link to="/add" className="btn btn-primary">Создать Новый Товар</Link>
+            <Link to="/home" className="btn btn-warning">Товар</Link>
+            <button className="btn btn-danger" onClick={handleLogout}>Выйти</button>
+          </div>
         </div>
       ) : (
-        <Link to='/'>🔄 Уппс , вы еще не зарегестрированы</Link>
+        <div className="profile-not-registered">
+          <p>Вы еще не зарегистрированы</p>
+          <Link to='/'>Вернуться на главную страницу</Link>
+        </div>
       )}
     </div>
   );
